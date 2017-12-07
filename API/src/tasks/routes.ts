@@ -1,10 +1,10 @@
-import * as Hapi from "hapi";
-import * as Joi from "joi";
-import TaskController from "./task-controller";
-import * as TaskValidator from "./task-validator";
-import { jwtValidator } from "../users/user-validator";
-import { IDatabase } from "../database";
-import { IServerConfigurations } from "../configurations";
+import * as Hapi from 'hapi';
+import * as Joi from 'joi';
+import TaskController from './task-controller';
+import * as TaskValidator from './task-validator';
+import { jwtValidator } from '../users/user-validator';
+import { IDatabase } from '../database';
+import { IServerConfigurations } from '../configurations';
 
 export default function (server: Hapi.Server, configs: IServerConfigurations, database: IDatabase) {
 
@@ -16,7 +16,7 @@ export default function (server: Hapi.Server, configs: IServerConfigurations, da
         path: '/tasks/{id}',
         config: {
             handler: taskController.getTaskById,
-            auth: "jwt",
+            auth: 'jwt',
             tags: ['api', 'tasks'],
             description: 'Get task by id.',
             validate: {
@@ -45,7 +45,7 @@ export default function (server: Hapi.Server, configs: IServerConfigurations, da
         path: '/tasks',
         config: {
             handler: taskController.getTasks,
-            auth: "jwt",
+            auth: 'jwt',
             tags: ['api', 'tasks'],
             description: 'Get all tasks.',
             validate: {
@@ -63,7 +63,7 @@ export default function (server: Hapi.Server, configs: IServerConfigurations, da
         path: '/tasks/{id}',
         config: {
             handler: taskController.deleteTask,
-            auth: "jwt",
+            auth: 'jwt',
             tags: ['api', 'tasks'],
             description: 'Delete task by id.',
             validate: {
@@ -92,7 +92,7 @@ export default function (server: Hapi.Server, configs: IServerConfigurations, da
         path: '/tasks/{id}',
         config: {
             handler: taskController.updateTask,
-            auth: "jwt",
+            auth: 'jwt',
             tags: ['api', 'tasks'],
             description: 'Update task by id.',
             validate: {
@@ -122,7 +122,7 @@ export default function (server: Hapi.Server, configs: IServerConfigurations, da
         path: '/tasks',
         config: {
             handler: taskController.createTask,
-            auth: "jwt",
+            auth: 'jwt',
             tags: ['api', 'tasks'],
             description: 'Create a task.',
             validate: {

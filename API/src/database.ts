@@ -1,7 +1,7 @@
-import * as Mongoose from "mongoose";
-import { IDataConfiguration } from "./configurations";
-import { IUser, UserModel } from "./users/user";
-import { ITask, TaskModel } from "./tasks/task";
+import * as Mongoose from 'mongoose';
+import { IDataConfiguration } from './configurations';
+import { IUser, UserModel } from './users/user';
+import { ITask, TaskModel } from './tasks/task';
 
 export interface IDatabase {
     userModel: Mongoose.Model<IUser>;

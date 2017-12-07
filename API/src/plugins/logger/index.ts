@@ -1,12 +1,12 @@
-import { IPlugin } from "../interfaces";
-import * as Hapi from "hapi";
+import { IPlugin } from '../interfaces';
+import * as Hapi from 'hapi';
 
 export default (): IPlugin => {
     return {
         register: (server: Hapi.Server): Promise<void> => {
             const opts = {
                 ops: {
-                    interval: 1000
+                    interval: 1000,
                 },
                 reporters: {
                     consoleReporter: [{
@@ -14,7 +14,7 @@ export default (): IPlugin => {
                         name: 'Squeeze',
                         args: [{ error: '*', log: '*', response: '*', request: '*' }]
                     }, {
-                        module: 'good-console'
+                        module: 'good-console',
                     }, 'stdout']
                 }
             };
@@ -22,7 +22,7 @@ export default (): IPlugin => {
             return new Promise<void>((resolve) => {
                 server.register({
                     register: require('good'),
-                    options: opts
+                    options: opts,
                 }, (error) => {
                     if (error) {
                         console.log(`Error registering logger plugin: ${error}`);
@@ -34,8 +34,8 @@ export default (): IPlugin => {
         },
         info: () => {
             return {
-                name: "Good Logger",
-                version: "1.0.0"
+                name: 'Good Logger',
+                version: '1.0.0',
             };
         }
     };

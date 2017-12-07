@@ -1,5 +1,5 @@
-import * as Mongoose from "mongoose";
-import * as Bcrypt from "bcryptjs";
+import * as Mongoose from 'mongoose';
+import * as Bcrypt from 'bcryptjs';
 
 export interface IUser extends Mongoose.Document {
   name: string;

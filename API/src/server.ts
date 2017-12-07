@@ -1,10 +1,10 @@
-import * as Hapi from "hapi";
-import * as Boom from "boom";
-import { IPlugin } from "./plugins/interfaces";
-import { IServerConfigurations } from "./configurations";
-import * as Tasks from "./tasks";
-import * as Users from "./users";
-import { IDatabase } from "./database";
+import * as Hapi from 'hapi';
+import * as Boom from 'boom';
+import { IPlugin } from './plugins/interfaces';
+import { IServerConfigurations } from './configurations';
+import * as Tasks from './tasks';
+import * as Users from './users';
+import { IDatabase } from './database';
 
 
 export function init(configs: IServerConfigurations, database: IDatabase): Promise<Hapi.Server> {
@@ -15,7 +15,7 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
         const server = new Hapi.Server();
 
         server.connection({
-            port: port,
+            port,
             routes: {
                 cors: true
             }
@@ -26,16 +26,16 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
         }
 
         //  Setup Hapi Plugins
-        const plugins: Array<string> = configs.plugins;
+        const plugins: string[] = configs.plugins;
         const pluginOptions = {
-            database: database,
+            database,
             serverConfigs: configs
         };
 
-        let pluginPromises = [];
+        const pluginPromises = [];
 
         plugins.forEach((pluginName: string) => {
-            var plugin: IPlugin = (require("./plugins/" + pluginName)).default();
+          const plugin: IPlugin = (require(`./plugins/${pluginName}`)).default();
             console.log(`Register Plugin ${plugin.info().name} v${plugin.info().version}`);
             pluginPromises.push(plugin.register(server, pluginOptions));
         });
@@ -46,7 +46,7 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
             console.log('Register Routes');
             Tasks.init(server, configs, database);
             Users.init(server, configs, database);
-            console.log('Routes registered sucessfully.');
+            console.log('Routes registered successfully.');
 
             resolve(server);
         });

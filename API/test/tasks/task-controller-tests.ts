@@ -1,18 +1,18 @@
-import * as chai from "chai";
-import TaskController from "../../src/tasks/task-controller";
-import { ITask } from "../../src/tasks/task";
-import { IUser } from "../../src/users/user";
-import * as Configs from "../../src/configurations";
-import * as Server from "../../src/server";
-import * as Database from "../../src/database";
-import * as Utils from "../utils";
+import * as chai from 'chai';
+import TaskController from '../../src/tasks/task-controller';
+import { ITask } from '../../src/tasks/task';
+import { IUser } from '../../src/users/user';
+import * as Configs from '../../src/configurations';
+import * as Server from '../../src/server';
+import * as Database from '../../src/database';
+import * as Utils from '../utils';
 
 const configDb = Configs.getDatabaseConfig();
 const database = Database.init(configDb);
 const assert = chai.assert;
 const serverConfig = Configs.getServerConfigs();
 
-describe("TastController Tests", () => {
+describe('TastController Tests', () => {
 
     let server;
 
@@ -31,47 +31,47 @@ describe("TastController Tests", () => {
         Utils.clearDatabase(database, done);
     });
 
-    it("Get tasks", (done) => {
-        var user = Utils.createUserDummy();
+    it('Get tasks', (done) => {
+      const user = Utils.createUserDummy();
 
         server.inject({
-            method: 'POST', url: serverConfig.routePrefix + '/users/login', payload: {
+            method: 'POST', url: `${serverConfig.routePrefix}/users/login`, payload: {
                 email: user.email,
                 password: user.password
             }
         }, (res) => {
             assert.equal(200, res.statusCode);
-            var login: any = JSON.parse(res.payload);
+            const login: any = JSON.parse(res.payload);
 
-            server.inject({ method: 'Get', url: serverConfig.routePrefix + '/tasks', headers: { "authorization": login.token } }, (res) => {
+            server.inject({ method: 'Get', url: `${serverConfig.routePrefix}/tasks`, headers: { 'authorization': login.token } }, (res) => {
                 assert.equal(200, res.statusCode);
-                var responseBody: Array<ITask> = JSON.parse(res.payload);
+                const responseBody: ITask[] = JSON.parse(res.payload);
                 assert.equal(3, responseBody.length);
                 done();
             });
         });
     });
 
-    it("Get single task", (done) => {
-        var user = Utils.createUserDummy();
+    it('Get single task', (done) => {
+      const user = Utils.createUserDummy();
 
         server.inject({
-            method: 'POST', url: serverConfig.routePrefix + '/users/login', payload: {
+            method: 'POST', url: `${serverConfig.routePrefix}/users/login`, payload: {
                 email: user.email,
                 password: user.password
             }
         }, (res) => {
             assert.equal(200, res.statusCode);
-            var login: any = JSON.parse(res.payload);
+            const login: any = JSON.parse(res.payload);
 
             database.taskModel.findOne({}).then((task) => {
                 server.inject({
                     method: 'Get',
-                    url: serverConfig.routePrefix + '/tasks/' + task._id,
-                    headers: { "authorization": login.token }
-                }, (res) => {
-                    assert.equal(200, res.statusCode);
-                    var responseBody: ITask = JSON.parse(res.payload);
+                    url: `${serverConfig.routePrefix}/tasks/${task._id}`,
+                    headers: { 'authorization': login.token }
+                }, (response) => {
+                    assert.equal(200, response.statusCode);
+                    const responseBody: ITask = JSON.parse(response.payload);
                     assert.equal(task.name, responseBody.name);
                     done();
                 });
@@ -79,28 +79,28 @@ describe("TastController Tests", () => {
         });
     });
 
-    it("Create task", (done) => {
-        var user = Utils.createUserDummy();
+    it('Create task', (done) => {
+      const user = Utils.createUserDummy();
 
         server.inject({
             method: 'POST',
-            url: serverConfig.routePrefix + '/users/login',
+            url: `${serverConfig.routePrefix}/users/login`,
             payload: { email: user.email, password: user.password }
         }, (res) => {
             assert.equal(200, res.statusCode);
-            var login: any = JSON.parse(res.payload);
+            const login: any = JSON.parse(res.payload);
 
-            database.userModel.findOne({ email: user.email }).then((user: IUser) => {
-                var task = Utils.createTaskDummy();
+            database.userModel.findOne({ email: user.email }).then((userRes: IUser) => {
+              const task = Utils.createTaskDummy();
 
                 server.inject({
                     method: 'POST',
-                    url: serverConfig.routePrefix + '/tasks',
+                    url: `${serverConfig.routePrefix}/tasks`,
                     payload: task,
-                    headers: { "authorization": login.token }
-                }, (res) => {
-                    assert.equal(201, res.statusCode);
-                    var responseBody: ITask = <ITask>JSON.parse(res.payload);
+                    headers: { 'authorization': login.token }
+                }, (response) => {
+                    assert.equal(201, response.statusCode);
+                    const responseBody: ITask = <ITask>JSON.parse(res.payload);
                     assert.equal(task.name, responseBody.name);
                     assert.equal(task.description, responseBody.description);
                     done();
@@ -109,20 +109,20 @@ describe("TastController Tests", () => {
         });
     });
 
-    it("Update task", (done) => {
-        var user = Utils.createUserDummy();
+    it('Update task', (done) => {
+      const user = Utils.createUserDummy();
 
         server.inject({
             method: 'POST',
-            url: serverConfig.routePrefix + '/users/login',
+            url: `${serverConfig.routePrefix}/users/login`,
             payload: { email: user.email, password: user.password }
         }, (res) => {
             assert.equal(200, res.statusCode);
-            var login: any = JSON.parse(res.payload);
+            const login: any = JSON.parse(res.payload);
 
             database.taskModel.findOne({}).then((task) => {
 
-                var updateTask = {
+              const updateTask = {
                     completed: true,
                     name: task.name,
                     description: task.description
@@ -130,14 +130,14 @@ describe("TastController Tests", () => {
 
                 server.inject({
                     method: 'PUT',
-                    url: serverConfig.routePrefix + '/tasks/' + task._id,
+                    url: `${serverConfig.routePrefix}/tasks/${task._id}`,
                     payload: updateTask,
-                    headers: { "authorization": login.token }
+                    headers: { 'authorization': login.token }
                 },
-                    (res) => {
+                    (response) => {
                         assert.equal(200, res.statusCode);
-                        console.log(res.payload);
-                        var responseBody: ITask = JSON.parse(res.payload);
+                        console.log(response.payload);
+                        const responseBody: ITask = JSON.parse(response.payload);
                         assert.isTrue(responseBody.completed);
                         done();
                     });
@@ -145,25 +145,25 @@ describe("TastController Tests", () => {
         });
     });
 
-    it("Delete single task", (done) => {
-        var user = Utils.createUserDummy();
+    it('Delete single task', (done) => {
+      const user = Utils.createUserDummy();
 
         server.inject({
             method: 'POST',
-            url: serverConfig.routePrefix + '/users/login',
+            url: `${serverConfig.routePrefix}/users/login`,
             payload: { email: user.email, password: user.password }
         }, (res) => {
             assert.equal(200, res.statusCode);
-            var login: any = JSON.parse(res.payload);
+            const login: any = JSON.parse(res.payload);
 
             database.taskModel.findOne({}).then((task) => {
                 server.inject({
                     method: 'DELETE',
-                    url: serverConfig.routePrefix + '/tasks/' + task._id,
-                    headers: { "authorization": login.token }
-                }, (res) => {
+                    url: `${serverConfig.routePrefix}/tasks/${task._id}`,
+                    headers: { 'authorization': login.token }
+                }, (response) => {
                     assert.equal(200, res.statusCode);
-                    var responseBody: ITask = JSON.parse(res.payload);
+                    const responseBody: ITask = JSON.parse(res.payload);
                     assert.equal(task.name, responseBody.name);
 
                     database.taskModel.findById(responseBody._id).then((deletedTask) => {

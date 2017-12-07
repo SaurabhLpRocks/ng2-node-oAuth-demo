@@ -1,10 +1,10 @@
-import * as Hapi from "hapi";
-import * as Joi from "joi";
-import UserController from "./user-controller";
-import { UserModel } from "./user";
-import * as UserValidator from "./user-validator";
-import { IDatabase } from "../database";
-import { IServerConfigurations } from "../configurations";
+import * as Hapi from 'hapi';
+import * as Joi from 'joi';
+import UserController from './user-controller';
+import { UserModel } from './user';
+import * as UserValidator from './user-validator';
+import { IDatabase } from '../database';
+import { IServerConfigurations } from '../configurations';
 
 export default function (server: Hapi.Server, serverConfigs: IServerConfigurations, database: IDatabase) {
 
@@ -16,7 +16,7 @@ export default function (server: Hapi.Server, serverConfigs: IServerConfiguratio
         path: '/users/info',
         config: {
             handler: userController.infoUser,
-            auth: "jwt",
+            auth: 'jwt',
             tags: ['api', 'users'],
             description: 'Get user info.',
             validate: {
@@ -42,7 +42,7 @@ export default function (server: Hapi.Server, serverConfigs: IServerConfiguratio
         path: '/users',
         config: {
             handler: userController.deleteUser,
-            auth: "jwt",
+            auth: 'jwt',
             tags: ['api', 'users'],
             description: 'Delete current user.',
             validate: {
@@ -68,7 +68,7 @@ export default function (server: Hapi.Server, serverConfigs: IServerConfiguratio
         path: '/users',
         config: {
             handler: userController.updateUser,
-            auth: "jwt",
+            auth: 'jwt',
             tags: ['api', 'users'],
             description: 'Update current user info.',
             validate: {

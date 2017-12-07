@@ -1,4 +1,4 @@
-import * as Mongoose from "mongoose";
+import * as Mongoose from 'mongoose';
 
 export interface ITask extends Mongoose.Document {
   userId: string;

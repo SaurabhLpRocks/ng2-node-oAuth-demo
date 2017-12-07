@@ -1,6 +1,6 @@
-import { IPlugin, IPluginOptions } from "../interfaces";
-import * as Hapi from "hapi";
-import { IUser, UserModel } from "../../users/user";
+import { IPlugin, IPluginOptions } from '../interfaces';
+import * as Hapi from 'hapi';
+import { IUser, UserModel } from '../../users/user';
 
 export default (): IPlugin => {
     return {
@@ -21,7 +21,7 @@ export default (): IPlugin => {
 
             return new Promise<void>((resolve) => {
                 server.register({
-                    register: require('hapi-auth-jwt2')
+                    register: require('hapi-auth-jwt2'),
                 }, (error) => {
                     if (error) {
                         console.log(`Error registering jwt plugin: ${error}`);
@@ -30,7 +30,7 @@ export default (): IPlugin => {
                             {
                                 key: serverConfig.jwtSecret,
                                 validateFunc: validateUser,
-                                verifyOptions: { algorithms: ['HS256'] }
+                                verifyOptions: { algorithms: ['HS256'] },
                             });
                     }
 
@@ -40,11 +40,9 @@ export default (): IPlugin => {
         },
         info: () => {
             return {
-                name: "JWT Authentication",
-                version: "1.0.0"
+                name: 'JWT Authentication',
+                version: '1.0.0',
             };
-        }
+        },
     };
 };
-
-
