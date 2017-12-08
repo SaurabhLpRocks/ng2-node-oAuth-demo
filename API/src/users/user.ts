@@ -52,7 +52,7 @@ UserSchema.pre('findOneAndUpdate', function () {
     return;
   }
 
-  this.findOneAndUpdate({}, { password: password });
+  this.findOneAndUpdate({}, { password });
 });
 
 export const UserModel = Mongoose.model<IUser>('User', UserSchema);

@@ -13,7 +13,7 @@ export function init(config: IDataConfiguration): IDatabase {
     (<any>Mongoose).Promise = Promise;
     Mongoose.connect(process.env.MONGO_URL || config.connectionString);
 
-    let mongoDb = Mongoose.connection;
+    const mongoDb = Mongoose.connection;
 
     mongoDb.on('error', () => {
         console.log(`Unable to connect to database: ${config.connectionString}`);

@@ -6,11 +6,31 @@
         "port": 5000,
         "jwtSecret": "random-secret-password",
         "jwtExpiration": "1h",
-        "routePrefix": "/api",
+        "routePrefix": "/api", 
         "plugins": [
             "logger",
             "jwt-auth",
             "swagger"
         ]
-    }
+    },
+    "oAuth": {  
+        "tenantId": "1ab41d5a-8833-4af0-82be-e3c54d03997b",  
+        "applicationId": "157906ba-0709-4c0e-b859-ba1d09c626a0",  
+        "clientId": "012d3688-d600-47d8-9f15-7ab816c3793d",  
+        "clientSecret": "pNykr2A234QW/O7G76+4vyD0wesZ/QlxCqJwzH08czU=",   
+        "identityMetadata": "https://login.microsoftonline.com/1ab41d5a-8833-4af0-82be-e3c54d03997b/.well-known/openid-configuration",  
+        "responseType": "id_token",  
+        "responseMode": "form_post",  
+        "redirectUrl": "http://localhost:4200",  
+        "allowHttpForRedirectUrl": true,  
+        "validateIssuer": true,  
+        "isB2C": false,  
+        "issuer": null,  
+        "passReqToCallback": false,  
+        "useCookieInsteadOfSession": true,  
+        "cookieEncryptionKeys": [{  
+                                    "key": "SA53867TE01265568990MS34PR78WKL2",  
+                                    "iv": "12BR530A2012"  
+                                }]  
+      }  
 }

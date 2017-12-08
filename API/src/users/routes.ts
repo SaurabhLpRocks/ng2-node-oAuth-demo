@@ -5,37 +5,14 @@ import { UserModel } from './user';
 import * as UserValidator from './user-validator';
 import { IDatabase } from '../database';
 import { IServerConfigurations } from '../configurations';
+import * as Bell from 'bell';
+import * as OAuthConfiguration from '../configurations/index'; 
 
 export default function (server: Hapi.Server, serverConfigs: IServerConfigurations, database: IDatabase) {
-
+    const oauthConfiguration = OAuthConfiguration.getOAuthConfigs();  
+    
     const userController = new UserController(serverConfigs, database);
     server.bind(userController);
-
-    server.route({
-        method: 'GET',
-        path: '/users/info',
-        config: {
-            handler: userController.infoUser,
-            auth: 'jwt',
-            tags: ['api', 'users'],
-            description: 'Get user info.',
-            validate: {
-                headers: UserValidator.jwtValidator,
-            },
-            plugins: {
-                'hapi-swagger': {
-                    responses: {
-                        '200': {
-                            'description': 'User founded.'
-                        },
-                        '401': {
-                            'description': 'Please login.'
-                        }
-                    }
-                }
-            }
-        }
-    });
 
     server.route({
         method: 'DELETE',
@@ -61,76 +38,48 @@ export default function (server: Hapi.Server, serverConfigs: IServerConfiguratio
                 }
             }
         }
+    });  
+
+    server.register(Bell);
+    console.log('bell registered ');
+    // server.register(Bell, () => {
+    server.auth.strategy('azure-oidc', 'bell', {
+        provider: 'azuread',
+        password: 'cookie_encryption_password_secure',
+        clientId: oauthConfiguration.applicationId,
+        clientSecret: oauthConfiguration.clientSecret,
+        isSecure: false,
+        providerParams: {
+            response_type: 'id_token',
+        },
+        scope: ['openid', 'offline_access', 'profile'],
     });
 
+    console.log('auth strategy registered ');
+    
     server.route({
-        method: 'PUT',
-        path: '/users',
+        method: '*',
+        path: '/login',
         config: {
-            handler: userController.updateUser,
-            auth: 'jwt',
-            tags: ['api', 'users'],
-            description: 'Update current user info.',
-            validate: {
-                payload: UserValidator.updateUserModel,
-                headers: UserValidator.jwtValidator
+            auth: {
+                strategy: 'azure-oidc',
+                mode: 'try',
             },
+            handler: userController.loginUser,
+            tags: ['api', 'user'],
+            description: 'Get user info.',
             plugins: {
                 'hapi-swagger': {
                     responses: {
                         '200': {
-                            'description': 'Updated info.',
+                            'description': 'User founded.',
                         },
                         '401': {
-                            'description': 'User does not have authorization.'
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    server.route({
-        method: 'POST',
-        path: '/users',
-        config: {
-            handler: userController.createUser,
-            tags: ['api', 'users'],
-            description: 'Create a user.',
-            validate: {
-                payload: UserValidator.createUserModel
+                            'description': 'Please login.',
+                        },
+                    },
+                },
             },
-            plugins: {
-                'hapi-swagger': {
-                    responses: {
-                        '201': {
-                            'description': 'User created.'
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    server.route({
-        method: 'POST',
-        path: '/users/login',
-        config: {
-            handler: userController.loginUser,
-            tags: ['api', 'users'],
-            description: 'Login a user.',
-            validate: {
-                payload: UserValidator.loginUserModel
-            },
-            plugins: {
-                'hapi-swagger': {
-                    responses: {
-                        '200': {
-                            'description': 'User logged in.'
-                        }
-                    }
-                }
-            }
-        }
+        },
     });
 }

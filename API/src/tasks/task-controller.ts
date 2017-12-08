@@ -20,9 +20,9 @@ export default class TaskController {
         newTask.userId = userId;
 
         try {
-            let task: ITask = await this.database.taskModel.create(newTask);
+            const task: ITask = await this.database.taskModel.create(newTask);
             return reply(task).code(201);
-        }catch (error) {
+        } catch (error) {
             return reply(Boom.badImplementation(error));
         }
     }

@@ -23,6 +23,24 @@ export interface IDataConfiguration {
     connectionString: string;
 }
 
+export interface IOAuthConfiguration {  
+    tenantId: string;  
+    applicationId: string;  
+    clientId: string;  
+    clientSecret: string;  
+    identityMetadata: string;  
+    responseType: string;  
+    responseMode: string;  
+    redirectUrl: string;  
+    allowHttpForRedirectUrl: boolean;  
+    validateIssuer: boolean;  
+    isB2C: boolean;  
+    issuer: boolean;  
+    passReqToCallback: boolean;  
+    useCookieInsteadOfSession: boolean;  
+    cookieEncryptionKeys: object;  
+}
+
 export function getDatabaseConfig(): IDataConfiguration {
     return configs.get('database');
 }
@@ -30,3 +48,7 @@ export function getDatabaseConfig(): IDataConfiguration {
 export function getServerConfigs(): IServerConfigurations {
     return configs.get('server');
 }
+
+export function getOAuthConfigs(): IOAuthConfiguration {  
+    return configs.get('oAuth');  
+}  

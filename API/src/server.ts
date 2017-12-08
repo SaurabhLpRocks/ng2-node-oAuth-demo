@@ -5,7 +5,9 @@ import { IServerConfigurations } from './configurations';
 import * as Tasks from './tasks';
 import * as Users from './users';
 import { IDatabase } from './database';
-
+import * as Bell from 'bell'; 
+import * as Inert from 'inert'; 
+import * as Path from 'path'; 
 
 export function init(configs: IServerConfigurations, database: IDatabase): Promise<Hapi.Server> {
 
@@ -39,6 +41,19 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
             console.log(`Register Plugin ${plugin.info().name} v${plugin.info().version}`);
             pluginPromises.push(plugin.register(server, pluginOptions));
         });
+
+        server.register(Inert); 
+        
+        //    server.route({  
+        //      method: 'GET',  
+        //      path: '/{login*}',  
+        //      handler: {  
+        //       directory: { 
+        //         path: Path.join( __dirname, 'public'), 
+        //        //  listing: true, 
+        //       }, 
+        //      },  
+        //    });    
 
         Promise.all(pluginPromises).then(() => {
             console.log('All plugins registered successfully.');
