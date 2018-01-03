@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Headers, Http, Request, RequestOptions, Response, XHRBackend } from '@angular/http';
+import { Headers, Http, Request, RequestOptions, RequestOptionsArgs, Response, XHRBackend } from '@angular/http';
 
 @Component({
   selector: 'app-root',
@@ -8,19 +8,20 @@ import { Headers, Http, Request, RequestOptions, Response, XHRBackend } from '@a
 })
 export class AppComponent {
   title = 'app';
-  userInfo:any;
+  userInfo: any;
 
-  constructor(private http: Http){}
+  constructor(private http: Http) { }
 
-  onLogin(): void {  
+  onLogin(): void {
     //  window.location.href= 'http://localhost:5000/api/login'; 
-     
-    console.log('in login com'); 
-     
-    this.http.get('http://localhost:5000/api/login',null).subscribe
-      (res => { 
-         console.log('in login service', res);         
-      });
-      
-    }   
+
+    console.log('in login com');
+    this.http.get('http://localhost:5000/api/login', null).subscribe(
+      (res) => {
+        console.log('in login service', res);
+      }, (err) => {
+        console.log('err', err);
+      }) ;
+
+  }
 }

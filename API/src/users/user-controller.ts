@@ -59,32 +59,10 @@ export default class UserController {
     }
 
     async loginUser(request: Hapi.Request, reply: Hapi.ReplyNoContinue) {
-        // const email = request.payload.email;
-        // const password = request.payload.password;
-    
-        // const user: IUser = await this.userDao.getUserByEmail(email);
-        // const user = await this.getUserByOAuth(request);
-    
+           
         if (!request.auth.isAuthenticated) {
           return reply(Boom.unauthorized(request.auth.error.message));
         }
-    
-        // if (!user.validatePassword(password)) {
-        //   return reply(Boom.unauthorized('Password is invalid.'));
-        // }
-        // request.auth.credentials = user;
-        // request.auth.isAuthenticated = true;
-        // reply({
-        //   token: this.generateToken(request.auth.credentials.profile),
-        //   roleIds: ['2'],
-        //   roleNames: ['Admin'],
-        //   firstName: request.auth.credentials.profile.given_name,
-        //   lastName:  request.auth.credentials.profile.family_name,
-        //   userName: request.auth.credentials.profile.email,
-        //   email: request.auth.credentials.profile.email,
-        //   userId: request.auth.credentials.profile.email,
-        // });
-        // return reply(`request.auth${JSON.stringify(request.auth.credentials, null, 4)}`);
     
         return reply.response({
                                 token: this.generateToken(request.auth.credentials.profile),
@@ -95,7 +73,24 @@ export default class UserController {
                                 userName: request.auth.credentials.profile.email,
                                 email: request.auth.credentials.profile.email,
                                 userId: request.auth.credentials.profile.email,
-                              }).redirect('http://localhost:4200');
+                              }).redirect('http://localhost:5000/app');
+      }
+
+      async isAuthenticated(request: Hapi.Request, reply: Hapi.ReplyNoContinue) {
+        if (!request.auth.isAuthenticated) {
+            return reply(Boom.unauthorized(request.auth.error.message));
+          }
+      
+          return reply.response({
+                                  token: this.generateToken(request.auth.credentials.profile),
+                                  roleIds: ['2'],
+                                  roleNames: ['Admin'],
+                                  firstName: request.auth.credentials.profile.given_name,
+                                  lastName:  request.auth.credentials.profile.family_name,
+                                  userName: request.auth.credentials.profile.email,
+                                  email: request.auth.credentials.profile.email,
+                                  userId: request.auth.credentials.profile.email,
+                                }).redirect('http://google.com');
       }
     
 }

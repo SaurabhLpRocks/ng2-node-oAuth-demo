@@ -1,15 +1,21 @@
-import * as Hapi from 'hapi';
+import * as AuthCookie from 'hapi-auth-cookie';
+import * as Bell from 'bell';
 import * as Boom from 'boom';
-import { IPlugin } from './plugins/interfaces';
-import { IServerConfigurations } from './configurations';
+import * as Hapi from 'hapi';
+import * as Inert from 'inert';
+import * as OAuthConfiguration from './configurations/index';
+import * as Path from 'path';
 import * as Tasks from './tasks';
 import * as Users from './users';
 import { IDatabase } from './database';
-import * as Bell from 'bell'; 
-import * as Inert from 'inert'; 
-import * as Path from 'path'; 
+import { IPlugin } from './plugins/interfaces';
+import { IServerConfigurations } from './configurations';
+import { error } from 'util';
+import { Server } from 'hapi';
+import { attributes } from './plugins/hapi-auth-cookie/index';
 
 export function init(configs: IServerConfigurations, database: IDatabase): Promise<Hapi.Server> {
+    const oauthConfiguration = OAuthConfiguration.getOAuthConfigs();
 
     return new Promise<Hapi.Server>(resolve => {
 
@@ -34,31 +40,75 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
             serverConfigs: configs
         };
 
+        const attribute = {
+            name: 'authentication',
+            version: '1.0.0'
+        };
+       
         const pluginPromises = [];
 
+        pluginPromises.push(server.register(Inert));
+        pluginPromises.push(server.register(Bell));
+        pluginPromises.push(server.register(AuthCookie));
+
+        // server.register(AuthCookie);
+        // pluginPromises.push(server.register({
+        //     register: AuthCookie, attributes: {
+        //         name: 'authentication',
+        //         version: '8.0.0'
+        //     }
+        // }));
+
+        // server.register(require('./plugins/hapi-auth-cookie/index'));
+
         plugins.forEach((pluginName: string) => {
-          const plugin: IPlugin = (require(`./plugins/${pluginName}`)).default();
+            const plugin: IPlugin = (require(`./plugins/${pluginName}`)).default();
             console.log(`Register Plugin ${plugin.info().name} v${plugin.info().version}`);
             pluginPromises.push(plugin.register(server, pluginOptions));
         });
 
-        server.register(Inert); 
-        
-        //    server.route({  
-        //      method: 'GET',  
-        //      path: '/{login*}',  
-        //      handler: {  
-        //       directory: { 
-        //         path: Path.join( __dirname, 'public'), 
-        //        //  listing: true, 
-        //       }, 
-        //      },  
-        //    });    
-
         Promise.all(pluginPromises).then(() => {
+
+            const authCookieOptions = {
+                password: 'cookie-encryption-password', // Password used for encryption
+                cookie: 'my-auth', // Name of cookie to set
+                redirectTo: '/login',
+                isSecure: false,
+            };
+
             console.log('All plugins registered successfully.');
 
+            server.auth.strategy('my-cookie', 'cookie', authCookieOptions);
+
+            server.auth.strategy('azure-oidc', 'bell', {
+                provider: 'azuread',
+                password: 'cookie_encryption_password_secure',
+                clientId: oauthConfiguration.applicationId,
+                clientSecret: oauthConfiguration.clientSecret,
+                isSecure: false,
+                providerParams: {
+                    response_type: 'id_token',
+                },
+                scope: ['openid', 'offline_access', 'profile'],
+            });
+
+            server.route({
+                method: 'GET',
+                path: '/app/{param*}',
+                handler: {
+                    directory: {
+                        path: Path.join(__dirname, 'public'),
+                        redirectToSlash: true,
+                        listing: true,
+                        index: ['index.html', 'default.html'],
+                    },
+                },
+            });
+
+            server.auth.default('session');
+
             console.log('Register Routes');
+
             Tasks.init(server, configs, database);
             Users.init(server, configs, database);
             console.log('Routes registered successfully.');
@@ -67,3 +117,4 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
         });
     });
 }
+
