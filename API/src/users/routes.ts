@@ -6,14 +6,14 @@ import * as UserValidator from './user-validator';
 import { IDatabase } from '../database';
 import { IServerConfigurations } from '../configurations';
 import * as Bell from 'bell';
-import * as OAuthConfiguration from '../configurations/index'; 
+import * as OAuthConfiguration from '../configurations/index';
 
 export default function (server: Hapi.Server, serverConfigs: IServerConfigurations, database: IDatabase) {
-    const oauthConfiguration = OAuthConfiguration.getOAuthConfigs();  
-    
+    const oauthConfiguration = OAuthConfiguration.getOAuthConfigs();
+
     const userController = new UserController(serverConfigs, database);
     server.bind(userController);
-    
+
     server.route({
         method: 'DELETE',
         path: '/users',
@@ -38,10 +38,10 @@ export default function (server: Hapi.Server, serverConfigs: IServerConfiguratio
                 }
             }
         }
-    });  
-    
+    });
+
     server.route({
-        method: '*',
+        method: 'GET',
         path: '/login',
         config: {
             auth: {

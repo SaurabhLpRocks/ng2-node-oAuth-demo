@@ -12,7 +12,6 @@ import { IPlugin } from './plugins/interfaces';
 import { IServerConfigurations } from './configurations';
 import { error } from 'util';
 import { Server } from 'hapi';
-import { attributes } from './plugins/hapi-auth-cookie/index';
 
 export function init(configs: IServerConfigurations, database: IDatabase): Promise<Hapi.Server> {
     const oauthConfiguration = OAuthConfiguration.getOAuthConfigs();
@@ -29,6 +28,11 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
             }
         });
 
+        // server.state('session', {  
+        //     ttl: 1000 * 60 * 60 * 24,    // 1 day lifetime
+        //     encoding: 'base64json'       // cookie data is JSON-stringified and Base64 encoded
+        //   });
+
         if (configs.routePrefix) {
             server.realm.modifiers.route.prefix = configs.routePrefix;
         }
@@ -44,16 +48,17 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
             name: 'authentication',
             version: '1.0.0'
         };
-       
-        const pluginPromises = [];
 
+        const pluginPromises = [];
         pluginPromises.push(server.register(Inert));
         pluginPromises.push(server.register(Bell));
-        pluginPromises.push(server.register(AuthCookie));
+        // pluginPromises.push(server.register(AuthCookie));
+        // server.register({ register: AuthCookie });
 
         // server.register(AuthCookie);
         // pluginPromises.push(server.register({
-        //     register: AuthCookie, attributes: {
+        //    register: AuthCookie,
+        //    attributes: {
         //         name: 'authentication',
         //         version: '8.0.0'
         //     }
@@ -78,7 +83,7 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
 
             console.log('All plugins registered successfully.');
 
-            server.auth.strategy('my-cookie', 'cookie', authCookieOptions);
+            // server.auth.strategy('my-cookie', 'cookie', authCookieOptions);
 
             server.auth.strategy('azure-oidc', 'bell', {
                 provider: 'azuread',
@@ -90,11 +95,12 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
                     response_type: 'id_token',
                 },
                 scope: ['openid', 'offline_access', 'profile'],
+                ttl: 1000 * 60 * 2
             });
 
             server.route({
                 method: 'GET',
-                path: '/app/{param*}',
+                path: '/{param*}',
                 handler: {
                     directory: {
                         path: Path.join(__dirname, 'public'),
@@ -105,14 +111,13 @@ export function init(configs: IServerConfigurations, database: IDatabase): Promi
                 },
             });
 
-            server.auth.default('session');
+            // server.auth.default('session');
 
             console.log('Register Routes');
 
             Tasks.init(server, configs, database);
             Users.init(server, configs, database);
             console.log('Routes registered successfully.');
-
             resolve(server);
         });
     });

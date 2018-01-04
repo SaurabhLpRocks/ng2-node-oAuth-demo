@@ -63,7 +63,8 @@ export default class UserController {
         if (!request.auth.isAuthenticated) {
           return reply(Boom.unauthorized(request.auth.error.message));
         }
-    
+        const cookie = request.headers.cookie;
+        
         return reply.response({
                                 token: this.generateToken(request.auth.credentials.profile),
                                 roleIds: ['2'],
@@ -73,24 +74,15 @@ export default class UserController {
                                 userName: request.auth.credentials.profile.email,
                                 email: request.auth.credentials.profile.email,
                                 userId: request.auth.credentials.profile.email,
-                              }).redirect('http://localhost:5000/app');
+                              }).redirect('http://localhost:5000').state('bell-azuread', cookie);
       }
 
       async isAuthenticated(request: Hapi.Request, reply: Hapi.ReplyNoContinue) {
-        if (!request.auth.isAuthenticated) {
-            return reply(Boom.unauthorized(request.auth.error.message));
+        if (!request.headers.cookie) {
+            return reply(Boom.unauthorized('not authenticated'));
           }
       
-          return reply.response({
-                                  token: this.generateToken(request.auth.credentials.profile),
-                                  roleIds: ['2'],
-                                  roleNames: ['Admin'],
-                                  firstName: request.auth.credentials.profile.given_name,
-                                  lastName:  request.auth.credentials.profile.family_name,
-                                  userName: request.auth.credentials.profile.email,
-                                  email: request.auth.credentials.profile.email,
-                                  userId: request.auth.credentials.profile.email,
-                                }).redirect('http://google.com');
+          return reply.redirect('http://google.com');
       }
     
 }
